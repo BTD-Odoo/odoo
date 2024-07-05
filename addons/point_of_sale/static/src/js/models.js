@@ -1314,15 +1314,15 @@ exports.PosModel = Backbone.Model.extend({
                                 args: [server_ids, ['account_move']],
                                 kwargs: { load: false },
                             });
-                            await self
-                                .do_action('account.account_invoices', {
-                                    additional_context: {
-                                        active_ids: [orderWithInvoice.account_move],
-                                    },
-                                })
-                                .catch(() => {
-                                    reject({ code: 401, message: 'Backend Invoice', data: { order: order }, server_ids: server_ids });
-                                });
+                            // await self
+                            //     .do_action('account.account_invoices', {
+                            //         additional_context: {
+                            //             active_ids: [orderWithInvoice.account_move],
+                            //         },
+                            //     })
+                            //     .catch(() => {
+                            //         reject({ code: 401, message: 'Backend Invoice', data: { order: order }, server_ids: server_ids });
+                            //     });
                         } else {
                             reject({ code: 401, message: 'Backend Invoice', data: { order: order } });
                         }

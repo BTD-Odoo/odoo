@@ -269,6 +269,8 @@ odoo.define('point_of_sale.PaymentScreen', function (require) {
                 }
             }
 
+            await new Promise(r => setTimeout(r, 2000));
+
             this.showScreen(this.nextScreen);
 
             // If we succeeded in syncing the current order, and
@@ -288,6 +290,7 @@ odoo.define('point_of_sale.PaymentScreen', function (require) {
                     this.env.pos.push_orders();
                 }
             }
+
         }
         get nextScreen() {
             return !this.error? 'ReceiptScreen' : 'ProductScreen';
