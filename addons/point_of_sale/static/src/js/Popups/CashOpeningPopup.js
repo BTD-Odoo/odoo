@@ -36,7 +36,7 @@ odoo.define('point_of_sale.CashOpeningPopup', function(require) {
             this.rpc({
                    model: 'pos.session',
                     method: 'set_cashbox_pos',
-                    args: [this.env.pos.pos_session.id, this.state.openingCash, this.state.notes],
+                    args: [this.env.pos.pos_session.id, this.state.openingCash, this.state.notes, this.env.pos.get("cashier") || this.env.pos.get_cashier()],
                 });
             this.cancel(); // close popup
         }

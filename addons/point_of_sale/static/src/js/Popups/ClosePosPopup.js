@@ -145,7 +145,7 @@ odoo.define('point_of_sale.ClosePosPopup', function(require) {
                     response = await this.rpc({
                         model: 'pos.session',
                         method: 'close_session_from_ui',
-                        args: [this.env.pos.pos_session.id, bankPaymentMethodDiffPairs],
+                        args: [this.env.pos.pos_session.id, bankPaymentMethodDiffPairs, this.env.pos.get("cashier") || this.env.pos.get_cashier()],
                         context: this.env.session.user_context,
                     });
                     if (!response.successful) {

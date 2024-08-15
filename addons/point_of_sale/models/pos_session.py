@@ -99,6 +99,8 @@ class PosSession(models.Model):
     is_in_company_currency = fields.Boolean('Is Using Company Currency', compute='_compute_is_in_company_currency')
     update_stock_at_closing = fields.Boolean('Stock should be updated at closing')
     bank_payment_ids = fields.One2many('account.payment', 'pos_session_id', 'Bank Payments', help='Account payments representing aggregated and bank split payments.')
+    closing_employee_id = fields.Many2one('hr.employee', string='Cerrada por empleado')
+    opening_employee_id = fields.Many2one('hr.employee', string='Abierta por empleado')
 
     _sql_constraints = [('uniq_name', 'unique(name)', "The name of this POS Session must be unique !")]
 
@@ -393,7 +395,7 @@ class PosSession(models.Model):
             'context': {**self.env.context, 'active_ids': self.ids, 'active_model': 'pos.session'},
         }
 
-    def close_session_from_ui(self, bank_payment_method_diff_pairs=None):
+    def close_session_from_ui(self, bank_payment_method_diff_pairs=None, cashier=None):
         """Calling this method will try to close the session.
 
         param bank_payment_method_diff_pairs: list[(int, float)]
@@ -405,6 +407,7 @@ class PosSession(models.Model):
         'redirect' is a boolean used to know whether we redirect the user to the back end or not.
         When necessary, error (i.e. UserError, AccessError) is raised which should redirect the user to the back end.
         """
+        self.closing_employee_id = cashier.get('id', False)
         bank_payment_method_diffs = dict(bank_payment_method_diff_pairs or [])
         self.ensure_one()
         # Even if this is called in `post_closing_cash_details`, we need to call this here too for case
@@ -1496,13 +1499,15 @@ class PosSession(models.Model):
             'url': self.config_id._get_pos_base_url() + '?config_id=%d' % self.config_id.id,
         }
 
-    def set_cashbox_pos(self, cashbox_value, notes):
+    def set_cashbox_pos(self, cashbox_value, notes, cashier=None):
         if not self.env.user.has_group('point_of_sale.group_pos_user'):
             raise AccessError(_("You don't have the access rights to set the point of sale cash box."))
         self.state = 'opened'
         self.opening_notes = notes
         difference = cashbox_value - self.cash_register_id.balance_start
         self._post_cash_details_message('Opening', difference, notes)
+        if not self.opening_employee_id and cashier:
+            self.opening_employee_id = cashier.get('id', False)
         #if there is a difference create an account move to register the loss
         if difference:
             self.env['account.bank.statement.line'].sudo().create({
