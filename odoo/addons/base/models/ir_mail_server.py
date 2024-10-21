@@ -336,6 +336,8 @@ class IrMailServer(models.Model):
                       "You could use STARTTLS instead. "
                        "If SSL is needed, an upgrade to Python 2.6 on the server-side "
                        "should do the trick."))
+        logging.info('---------------------- LOGS MAIL LP -----------------------')
+        logging.info('%s\n%s\n%s\n%s' % (smtp_server, smtp_port, smtp_encryption, str(ssl_context)))
         connection = SMTPConnection(smtp_server, smtp_port, smtp_encryption, context=ssl_context)
         connection.set_debuglevel(smtp_debug)
         if smtp_encryption == 'starttls':
@@ -352,6 +354,7 @@ class IrMailServer(models.Model):
             local, at, domain = smtp_user.rpartition('@')
             if at:
                 smtp_user = local + at + idna.encode(domain).decode('ascii')
+            logging.info('%s\n%s\n%s' % (str(connection), smtp_user, smtp_password))
             mail_server._smtp_login(connection, smtp_user, smtp_password or '')
 
         # Some methods of SMTP don't check whether EHLO/HELO was sent.
