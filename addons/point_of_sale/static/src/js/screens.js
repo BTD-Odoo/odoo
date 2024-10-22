@@ -1667,7 +1667,7 @@ var ReceiptScreenWidget = ScreenWidget.extend({
 
         this.render_change();
         this.render_receipt();
-        this.handle_auto_print();
+        setTimeout(() => { this.handle_auto_print()} , 2000);
     },
     handle_auto_print: function() {
         if (this.should_auto_print() && !this.pos.get_order().is_to_email()) {
